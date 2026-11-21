@@ -1,0 +1,29 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/variables/1.0.0/schema.json",
+  "variables": [
+    {
+      "name": "sql_connection_id",
+      "note": "",
+      "type": "String",
+      "value": "eb67505a-84da-4c48-9243-792e0b5698ac"
+    },
+    {
+      "name": "source_database",
+      "note": "",
+      "type": "String",
+      "value": "AdventureWorks2025"
+    },
+    {
+      "name": "full_reload",
+      "note": "",
+      "type": "Boolean",
+      "value": true
+    },
+    {
+      "name": "alert_email",
+      "note": "",
+      "type": "String",
+      "value": "manuatemba@gmail.com"
+    }
+  ]
+}

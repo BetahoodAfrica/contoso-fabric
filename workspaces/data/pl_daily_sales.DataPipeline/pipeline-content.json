@@ -1,0 +1,219 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "batchCount": 4,
+          "items": {
+            "value": "@pipeline().parameters.tables",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "SqlServerSource",
+                  "sqlReaderQuery": {
+                    "value": "@if(equals(item().load, 'incremental'),\n    concat('SELECT ', item().columns, ' FROM [', item().schema, '].[', item().table, '] WHERE ModifiedDate >= DATEADD(day, -7, ''', variables('watermark'), ''')'),\n    concat('SELECT ', item().columns, ' FROM [', item().schema, '].[', item().table, ']'))",
+                    "type": "Expression"
+                  },
+                  "partitionOption": "None",
+                  "queryTimeout": "02:00:00",
+                  "datasetSettings": {
+                    "type": "SqlServerTable",
+                    "typeProperties": {
+                      "database": "AdventureWorks2025"
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "fada6dfa-f0d1-470a-ab1e-f55add501d73"
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "ParquetSink",
+                  "formatSettings": {
+                    "type": "ParquetWriteSettings",
+                    "enableVertiParquet": true
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseWriteSettings"
+                  },
+                  "datasetSettings": {
+                    "type": "Parquet",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat('raw/', item().schema, '/', item().table, '/load_date=', variables('v_load_date'))",
+                          "type": "Expression"
+                        },
+                        "fileName": {
+                          "value": "@concat(item().table, '.parquet')",
+                          "type": "Expression"
+                        }
+                      },
+                      "compressionCodec": "snappy"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "lh_bronze",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "239f5fbc-a6ee-b8f6-4a45-4b5a0d4f3f4b",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Copy datafrom source",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "foreach_table",
+        "description": "",
+        "dependsOn": [
+          {
+            "activity": "set_load_date",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "v_load_date",
+          "value": {
+            "value": "@if(empty(pipeline().parameters.load_date), formatDateTime(utcNow(), 'yyyy-MM-dd'), pipeline().parameters.load_date)",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "set_load_date",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "tables": {
+        "type": "array",
+        "defaultValue": [
+          {
+            "schema": "Sales",
+            "table": "SalesOrderHeader",
+            "load": "incremental",
+            "columns": "SalesOrderID, RevisionNumber, OrderDate, DueDate, ShipDate, Status, OnlineOrderFlag, SalesOrderNumber, PurchaseOrderNumber, AccountNumber, CustomerID, SalesPersonID, TerritoryID, BillToAddressID, ShipToAddressID, ShipMethodID, CurrencyRateID, SubTotal, TaxAmt, Freight, TotalDue, ModifiedDate"
+          },
+          {
+            "schema": "Sales",
+            "table": "SalesOrderDetail",
+            "load": "incremental",
+            "columns": "*"
+          },
+          {
+            "schema": "Sales",
+            "table": "Customer",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Person",
+            "table": "Person",
+            "load": "full",
+            "columns": "BusinessEntityID, PersonType, Title, FirstName, MiddleName, LastName, EmailPromotion, ModifiedDate"
+          },
+          {
+            "schema": "Sales",
+            "table": "Store",
+            "load": "full",
+            "columns": "BusinessEntityID, Name, SalesPersonID, ModifiedDate"
+          },
+          {
+            "schema": "Production",
+            "table": "Product",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Production",
+            "table": "ProductSubcategory",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Production",
+            "table": "ProductCategory",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Sales",
+            "table": "SalesTerritory",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Person",
+            "table": "Address",
+            "load": "full",
+            "columns": "AddressID, AddressLine1, City, StateProvinceID, PostalCode, ModifiedDate"
+          },
+          {
+            "schema": "Person",
+            "table": "StateProvince",
+            "load": "full",
+            "columns": "*"
+          },
+          {
+            "schema": "Person",
+            "table": "CountryRegion",
+            "load": "full",
+            "columns": "*"
+          }
+        ]
+      },
+      "load_date": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "v_load_date": {
+        "type": "String"
+      },
+      "watermark": {
+        "type": "String",
+        "defaultValue": "1900-01-01"
+      }
+    }
+  }
+}

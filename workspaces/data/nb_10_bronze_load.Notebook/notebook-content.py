@@ -16,8 +16,7 @@
 
 # CELL ********************
 
-# --- Parameters cell (toggle "parameter cell"; the pipeline overrides these) ---
-load_date = "2026-11-22"
+load_date = "latest"      # or an exact date such as "2026-11-22"; the pipeline will pass one
 tables = ("Sales.SalesOrderHeader,Sales.SalesOrderDetail,Sales.Customer,Person.Person,Sales.Store,"
           "Production.Product,Production.ProductSubcategory,Production.ProductCategory,"
           "Sales.SalesTerritory,Person.Address,Person.StateProvince,Person.CountryRegion")
@@ -31,32 +30,39 @@ tables = ("Sales.SalesOrderHeader,Sales.SalesOrderDetail,Sales.Customer,Person.P
 
 # CELL ********************
 
-import re
+%run nb_00_common
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 from pyspark.sql import functions as F
 
-# The workspace the notebook runs in (feature, Dev, Test or Prod): no config needed
-WS = notebookutils.runtime.context["currentWorkspaceName"]
-# Per-environment settings (full_reload, alert_email...) come from the variable library
-vl = notebookutils.variableLibrary.getLibrary("vl_config")
-
-def onelake(lakehouse: str, sub: str) -> str:
-    return f"abfss://{WS}@onelake.dfs.fabric.microsoft.com/{lakehouse}.Lakehouse/{sub}"
-
-def snake(name: str) -> str:
-    # SalesOrderHeader -> sales_order_header, SalesOrderID -> sales_order_id
-    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", name).lower()
+def latest_load_date(schema: str, table: str) -> str:
+    # Newest load_date=YYYY-MM-DD folder for this table
+    folders = [f.name.rstrip("/") for f in notebookutils.fs.ls(onelake("lh_bronze", f"Files/raw/{schema}/{table}"))
+               if f.name.startswith("load_date=")]
+    return max(folders).split("=")[1]          # ISO dates sort correctly as text
 
 for item in [x.strip() for x in tables.split(",")]:
     schema, table = item.split(".")
-    src = onelake("lh_bronze", f"Files/raw/{schema}/{table}/load_date={load_date}")
+    run_date = load_date if load_date != "latest" else latest_load_date(schema, table)
+    src = onelake("lh_bronze", f"Files/raw/{schema}/{table}/load_date={run_date}")
     df = (spark.read.parquet(src)
-            .withColumn("_load_date", F.lit(load_date).cast("date"))
+            .withColumn("_load_date", F.lit(run_date).cast("date"))
             .withColumn("_ingested_at", F.current_timestamp())
             .withColumn("_source_file", F.col("_metadata.file_path")))
-    (df.write.format("delta").mode("append")
-        .option("mergeSchema", "true")      # tolerate new source columns
+    (df.write.format("delta")
+        .mode("overwrite")
+        .option("replaceWhere", f"_load_date = '{run_date}'")   # replace only this day's rows
+        .option("mergeSchema", "true")
         .save(onelake("lh_bronze", f"Tables/dbo/{snake(table)}")))
-    print(f"{item}: {df.count():,} rows appended")
+    print(f"{item}: load {run_date}, {df.count():,} rows written")
 
 # METADATA ********************
 

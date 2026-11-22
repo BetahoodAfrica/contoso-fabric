@@ -17,7 +17,7 @@
 # CELL ********************
 
 # --- Parameters cell (toggle "parameter cell"; the pipeline overrides these) ---
-load_date = "2026-11-21"
+load_date = "2026-11-22"
 tables = ("Sales.SalesOrderHeader,Sales.SalesOrderDetail,Sales.Customer,Person.Person,Sales.Store,"
           "Production.Product,Production.ProductSubcategory,Production.ProductCategory,"
           "Sales.SalesTerritory,Person.Address,Person.StateProvince,Person.CountryRegion")
@@ -64,6 +64,3 @@ for item in [x.strip() for x in tables.split(",")]:
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
-
-# MARKDOWN ********************
-

@@ -13,7 +13,7 @@
 
 # Welcome to your new notebook
 # Type here in the cell editor to add code!
-load_date = "2026-11-22"              # the bronze load to process
+load_date = "latest"              # the bronze load to process
 tables = "all"         # one table to start; "all" for everything
 
 # METADATA ********************
@@ -103,7 +103,9 @@ CONFIG = {
 run_list = CONFIG if tables == "all" else {t.strip(): CONFIG[t.strip()] for t in tables.split(",")}
 for table, keys in run_list.items():
     bronze = spark.read.format("delta").load(onelake("lh_bronze", f"Tables/dbo/{table}"))
-    src = to_snake_columns(bronze).filter(F.col("_load_date") == load_date)
+    run_date = load_date if load_date != "latest" else bronze.agg(F.max("_load_date")).first()[0]
+    src = to_snake_columns(bronze).filter(F.col("_load_date") == run_date)
+    print(f"{table}: processing load {run_date}")
     src = latest_per_key(src, keys)
     src = CLEANERS.get(table, lambda d: d)(src)
     good, bad = split_valid(src, keys)

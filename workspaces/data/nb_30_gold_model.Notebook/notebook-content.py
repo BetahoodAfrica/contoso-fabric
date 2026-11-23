@@ -38,13 +38,13 @@ load_date = "latest"
 from delta.tables import DeltaTable
 from pyspark.sql import Window, functions as F
 
-scd_date = load_date if load_date != "latest" else str(spark.table("s_product").agg(F.max("_load_date")).first()[0])
-print("Modelling as of:", scd_date)
-
 for t in ["sales_order_header", "sales_order_detail", "customer", "person", "store", "product",
           "product_subcategory", "product_category", "sales_territory", "address",
           "state_province", "country_region"]:
     spark.read.format("delta").load(onelake("lh_silver", f"Tables/dbo/{t}")).createOrReplaceTempView(f"s_{t}")
+    
+scd_date = load_date if load_date != "latest" else str(spark.table("s_product").agg(F.max("_load_date")).first()[0])
+print("Modelling as of:", scd_date)
 
 def write_gold(df, name):
     # V-Order speeds up Direct Lake reads: enable it for the session first,

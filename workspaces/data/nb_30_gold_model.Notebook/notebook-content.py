@@ -13,7 +13,7 @@
 
 # Welcome to your new notebook
 # Type here in the cell editor to add code!
-load_date = "lates"
+load_date = "latest"
 
 # METADATA ********************
 

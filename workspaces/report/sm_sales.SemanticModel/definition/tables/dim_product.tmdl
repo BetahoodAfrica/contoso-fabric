@@ -1,0 +1,171 @@
+table dim_product
+	lineageTag: 6cd14041-0a1a-40e5-871d-1537dceb9ff7
+	sourceLineageTag: [dbo].[dim_product]
+
+	column product_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b88289c4-ad8e-4283-95bc-97b64f5422d5
+		sourceLineageTag: product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_code
+		dataType: string
+		lineageTag: e344ebd9-17fc-4354-b155-ee0a0ecb917a
+		sourceLineageTag: product_code
+		summarizeBy: none
+		sourceColumn: product_code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 7533e883-9817-4bd3-ab50-cca4c4b1f023
+		sourceLineageTag: product_name
+		summarizeBy: none
+		sourceColumn: product_name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column color
+		dataType: string
+		lineageTag: c1611f01-311d-4d73-8db3-1d3e32936926
+		sourceLineageTag: color
+		summarizeBy: none
+		sourceColumn: color
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column subcategory
+		dataType: string
+		lineageTag: 4e27f92d-7924-4b07-abec-1444c4822a99
+		sourceLineageTag: subcategory
+		summarizeBy: none
+		sourceColumn: subcategory
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: e529bd99-9195-4065-87a2-b5cc634580df
+		sourceLineageTag: category
+		summarizeBy: none
+		sourceColumn: category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column list_price
+		dataType: double
+		lineageTag: 816ee140-c430-476b-b37d-de03ac7781ff
+		sourceLineageTag: list_price
+		summarizeBy: none
+		sourceColumn: list_price
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column standard_cost
+		dataType: double
+		lineageTag: 1cef5a93-760d-4639-b40b-4f73a54b5934
+		sourceLineageTag: standard_cost
+		summarizeBy: none
+		sourceColumn: standard_cost
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column row_hash
+		dataType: string
+		isHidden
+		lineageTag: 068c2715-c4ef-415d-aa56-84d4eae94688
+		sourceLineageTag: row_hash
+		summarizeBy: none
+		sourceColumn: row_hash
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 686b6167-3809-48bf-84a4-b6870a2acce3
+		sourceLineageTag: product_key
+		summarizeBy: none
+		sourceColumn: product_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_from
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 23445c30-27fd-4762-b4ac-a107c279abb8
+		sourceLineageTag: valid_from
+		summarizeBy: none
+		sourceColumn: valid_from
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_to
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 58cf38b8-f7e1-46aa-81f5-d4361e51d1cc
+		sourceLineageTag: valid_to
+		summarizeBy: none
+		sourceColumn: valid_to
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_current
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 591ea2fa-9bb1-4c7a-b6b3-45a192a69962
+		sourceLineageTag: is_current
+		summarizeBy: none
+		sourceColumn: is_current
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_product = entity
+		mode: directLake
+		source
+			entityName: dim_product
+			schemaName: dbo
+			expressionSource: 'DirectLake - lh_gold'
+
+	changedProperty = IsHidden
+

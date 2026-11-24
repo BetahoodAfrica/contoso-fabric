@@ -1,0 +1,60 @@
+table dim_geography
+	lineageTag: a7c79090-a917-41da-a15b-121325a32e1d
+	sourceLineageTag: [dbo].[dim_geography]
+
+	column geography_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b1a4e927-69fc-46a9-b5a6-a63dd28e2ec9
+		sourceLineageTag: geography_key
+		summarizeBy: none
+		sourceColumn: geography_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: fc5817fd-89a6-48f6-93a6-beb7645b8a16
+		sourceLineageTag: city
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column postal_code
+		dataType: string
+		lineageTag: 7c01521c-e650-483d-ab5b-1ebbe1a3be8c
+		sourceLineageTag: postal_code
+		summarizeBy: none
+		sourceColumn: postal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_province
+		dataType: string
+		lineageTag: d4ba1bcf-03db-4adc-acc7-2f6c06865ce2
+		sourceLineageTag: state_province
+		summarizeBy: none
+		sourceColumn: state_province
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: a0fb9888-b1d6-49d4-ae5c-317fa88401eb
+		sourceLineageTag: country
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_geography = entity
+		mode: directLake
+		source
+			entityName: dim_geography
+			schemaName: dbo
+			expressionSource: 'DirectLake - lh_gold'
+

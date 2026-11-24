@@ -1,0 +1,51 @@
+table dim_sales_territory
+	lineageTag: 32244151-cfba-4040-9dc7-2eaededd3c5f
+	sourceLineageTag: [dbo].[dim_sales_territory]
+
+	column sales_territory_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bbdd06bd-fcbb-4eca-8310-815a4fb8ccd2
+		sourceLineageTag: sales_territory_key
+		summarizeBy: none
+		sourceColumn: sales_territory_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: 1272cb73-1096-41b4-bcb0-b52bfaac214e
+		sourceLineageTag: region
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_region_code
+		dataType: string
+		lineageTag: 7a36f74c-28a0-4037-a376-4905890f47c7
+		sourceLineageTag: country_region_code
+		summarizeBy: none
+		sourceColumn: country_region_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column territory_group
+		dataType: string
+		lineageTag: 879c7e2c-f95c-4dac-8418-2d7e396fd056
+		sourceLineageTag: territory_group
+		summarizeBy: none
+		sourceColumn: territory_group
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_sales_territory = entity
+		mode: directLake
+		source
+			entityName: dim_sales_territory
+			schemaName: dbo
+			expressionSource: 'DirectLake - lh_gold'
+
